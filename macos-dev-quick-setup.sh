@@ -43,7 +43,7 @@ Options:
   --setup-docker          Start Docker Desktop + sanity check
   --configure-wezterm     Write WezTerm config (backs up existing)
   --configure-nvim        Write minimal Neovim config (backs up existing)
-  --install-node-tools    Install global Node tooling (npm/bun/corepack)
+  --install-node-tools    Install Node LTS (nvm) + Bun/Deno tools
   --install-python-tools  Install Python tooling via pipx
   --install-mssql-tools   Install SQL Server CLI tools
   --install-vscode-exts   Install VS Code extensions
@@ -227,13 +227,12 @@ brew "yq"                    # YAML processor
 # === Development Languages ===
 # Pin sane baselines for polyglot projects (Python, Node LTS, Go, Rust).
 brew "python@3.13"
-brew "node@22"               # Node.js 22 LTS
+brew "nvm"                   # Node Version Manager (installs latest LTS below)
 brew "go"
 brew "rust"
 
 # === Modern JavaScript Runtimes ===
-# Bun and Deno as alternatives to Node.js for modern JS/TS development.
-brew "bun"                   # Fast JavaScript runtime and package manager
+# Deno as an alternative JS/TS runtime. Bun is installed via bun.sh (optional).
 brew "deno"                  # Secure JavaScript/TypeScript runtime
 
 # === Package Managers ===
@@ -407,21 +406,39 @@ fi'
 fi
 
 ### 3) Configure Node.js and package managers
-# Optional: global tooling; prefer per-project deps.
+# Optional: install Node via nvm (latest LTS).
 if [[ "$INSTALL_NODE_TOOLS" == "1" ]]; then
-  log "Configuring Node.js (global tooling enabled)..."
+  log "Configuring Node.js via nvm (latest LTS)..."
 
-  # Prefer activating Homebrew's Node 22 if present
-  if brew list --formula node@22 >/dev/null 2>&1; then
-    brew link --overwrite --force node@22 >/dev/null 2>&1 || true
+  # nvm is installed via Homebrew (in the Brewfile). Ensure it's initialized.
+  NVM_DIR="$HOME/.nvm"
+  mkdir -p "$NVM_DIR"
+
+  # Persist nvm init for future shells.
+  if [[ "$CONFIGURE_SHELL" == "1" ]]; then
+    configure_block "$HOME/.zshrc" nvm 'export NVM_DIR="$HOME/.nvm"
+# Homebrew installs nvm to /opt/homebrew/opt/nvm or /usr/local/opt/nvm
+[ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && . "$(brew --prefix)/opt/nvm/nvm.sh"'
+  fi
+
+  # Load nvm into the current shell.
+  if [ -s "$(brew --prefix)/opt/nvm/nvm.sh" ]; then
+    # shellcheck disable=SC1090
+    . "$(brew --prefix)/opt/nvm/nvm.sh"
+  fi
+
+  if command -v nvm >/dev/null 2>&1; then
+    nvm install --lts --latest-npm >/dev/null 2>&1 || nvm install --lts >/dev/null 2>&1
+    nvm alias default 'lts/*' >/dev/null 2>&1 || true
+    nvm use --lts >/dev/null 2>&1 || true
+  else
+    warn "nvm not available in this shell; try restarting your terminal."
   fi
 
   if command -v node >/dev/null 2>&1; then
-    NODE_VERSION=$(node --version)
-    success "Node.js available: $NODE_VERSION"
+    success "Node.js available: $(node --version)"
   else
-    warn "Node not on PATH yet (node@22 is versioned/keg-only)."
-    warn "Try: brew link --overwrite --force node@22"
+    warn "Node not on PATH yet. Open a new terminal or run: source ~/.zshrc"
   fi
 
   # Enable Corepack for pnpm/yarn
@@ -433,31 +450,57 @@ if [[ "$INSTALL_NODE_TOOLS" == "1" ]]; then
   # Configure Bun and Deno environments
   log "Configuring modern JavaScript runtimes..."
 
-  if command -v bun >/dev/null 2>&1; then
-    success "Bun installed: $(bun --version)"
-    bun install -g typescript eslint prettier 2>/dev/null || true
+  # Bun (recommended installer)
+  BUN_BIN_DIR="$HOME/.bun/bin"
+  if ! command -v bun >/dev/null 2>&1; then
+    log "Installing Bun (bun.sh installer)..."
+    curl -fsSL https://bun.sh/install | bash >/dev/null 2>&1 || warn "Bun install failed"
   fi
 
+  if [[ -d "$BUN_BIN_DIR" ]]; then
+    export PATH="$BUN_BIN_DIR:$PATH"
+    if [[ "$CONFIGURE_SHELL" == "1" ]]; then
+      configure_block "$HOME/.zshrc" bun-path 'if [ -d "$HOME/.bun/bin" ]; then
+  case ":$PATH:" in
+    *":$HOME/.bun/bin:"*) ;;
+    *) export PATH="$HOME/.bun/bin:$PATH" ;;
+  esac
+fi'
+    fi
+  fi
+
+  if command -v bun >/dev/null 2>&1; then
+    success "Bun available: $(bun --version)"
+    bun install -g typescript eslint prettier 2>/dev/null || true
+  else
+    warn "Bun not available on PATH"
+  fi
+
+  # Deno (Homebrew)
   if command -v deno >/dev/null 2>&1; then
     success "Deno installed: $(deno --version)"
     deno install --allow-read --allow-write --allow-net --allow-env --no-check -n vscode-deno https://deno.land/x/vscode_deno@0.9.0/main.ts 2>/dev/null || true
   fi
 
-  # Install global npm packages
-  log "Installing essential npm packages..."
-  npm install -g \
-    @openai/codex \
-    typescript \
-    tsx \
-    eslint \
-    prettier \
-    serve \
-    npm-check-updates \
-    vercel \
-    netlify-cli \
-    2>/dev/null || warn "Some npm packages may have failed"
+  # Optional: global npm CLIs
+  if command -v npm >/dev/null 2>&1; then
+    log "Installing essential npm packages..."
+    npm install -g \
+      @openai/codex \
+      typescript \
+      tsx \
+      eslint \
+      prettier \
+      serve \
+      npm-check-updates \
+      vercel \
+      netlify-cli \
+      2>/dev/null || warn "Some npm packages may have failed"
+  else
+    warn "npm not available; skipping global npm packages"
+  fi
 else
-  warn "Skipping global Node tooling. Re-run with --install-node-tools if desired."
+  warn "Skipping Node (nvm) setup. Re-run with --install-node-tools to enable it."
 fi
 
 ### 4) Configure Python
@@ -930,6 +973,10 @@ if [[ "$WRITE_SUMMARY" == "1" ]]; then
 
   cat > "$SUMMARY_FILE" <<'SUMMARY'
 # Mac Development Setup Complete
+
+## Quick Checks
+- Node (nvm): `node --version`
+- Bun: `bun --version`
 
 ## Maintenance
 - Homebrew: `brew update && brew upgrade` (and occasionally `brew cleanup`)

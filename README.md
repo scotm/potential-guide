@@ -50,7 +50,13 @@ Practical tips for working on a Mac after running `macos-dev-quick-setup.sh`. Th
 ## Runtimes & Packages
 
 - Node.js
-  - Node 22 is on PATH. Corepack is enabled; use `pnpm`, `yarn`, or `npm` per project.
+  - If enabled (`--install-node-tools`), the script installs `nvm` and installs/uses the latest Node LTS.
+  - Corepack is enabled; use `pnpm`, `yarn`, or `npm` per project.
+
+- Bun
+  - Installed via the official installer (`bun.sh`) when `--install-node-tools` is enabled.
+  - Adds `~/.bun/bin` to PATH when `--configure-shell` is enabled.
+  - Useful commands: `bun --version`, `bun install`, `bunx <pkg>`, `bun run <script>`.
 
 - Python
   - Use `pipx` for global CLI apps (e.g., `httpie`, `ruff`, `black`).
