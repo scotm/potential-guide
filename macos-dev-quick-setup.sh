@@ -338,7 +338,6 @@ cask "whatsapp"
 
 # Productivity
 cask "typora"                # markdown editor
-cask "microsoft-office"      # Includes OneDrive
 
 # Design
 cask "figma"
@@ -350,10 +349,9 @@ cask "chatgpt"
 
 # Media
 cask "iina"
-cask "handbrake"             # video converter
+cask "handbrake-app"         # video converter
 
 # Fonts
-tap "homebrew/cask-fonts"
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
 cask "font-fira-code"
