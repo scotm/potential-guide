@@ -860,11 +860,6 @@ alias di='docker images'
 alias dex='docker exec -it'
 alias dlog='docker logs -f'
 alias dprune='docker system prune'
-
-# Safety
-alias rm='rm -i'
-alias cp='cp -i'
-alias mv='mv -i'
 ALIASES
 )"
 else
