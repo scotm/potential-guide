@@ -793,9 +793,7 @@ mkdir -p "$HOME/.config"
 # Optional: installs aliases into ~/.zshrc.
 if [[ "$CONFIGURE_SHELL" == "1" ]]; then
   # Safer defaults (no aliasing cd). `cat` uses bat -pp to preserve pipes.
-  ALIASES_CONTENT=''
-  read -r -d '' ALIASES_CONTENT <<'ALIASES'
-
+  configure_block "$HOME/.zshrc" aliases "$(cat <<'ALIASES'
 # Custom aliases
 alias ll='eza -la --icons --git'
 alias l='eza -l --icons --git'
@@ -868,7 +866,7 @@ alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
 ALIASES
-  configure_block "$HOME/.zshrc" aliases "$ALIASES_CONTENT"
+)"
 else
   warn "Skipping aliases. Re-run with --configure-shell to enable them."
 fi
