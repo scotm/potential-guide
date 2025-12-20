@@ -42,6 +42,8 @@ Options:
   --trust-dotnet-dev-certs Trust .NET HTTPS dev certs
   --setup-docker          Start Docker Desktop + sanity check
   --configure-wezterm     Write WezTerm config (backs up existing)
+  --configure-ghostty     Write Ghostty config (backs up existing)
+  --configure-ghostty     Write Ghostty config (backs up existing)
   --configure-nvim        Write minimal Neovim config (backs up existing)
   --install-node-tools    Install Node LTS (nvm) + Bun/Deno tools
   --install-python-tools  Install Python tooling via pipx
@@ -65,6 +67,7 @@ GENERATE_SSH_KEY=0
 TRUST_DOTNET_DEV_CERTS=0
 SETUP_DOCKER=0
 CONFIGURE_WEZTERM=0
+CONFIGURE_GHOSTTY=0
 CONFIGURE_NVIM=0
 INSTALL_NODE_TOOLS=0
 INSTALL_PYTHON_TOOLS=0
@@ -87,7 +90,8 @@ while [[ $# -gt 0 ]]; do
       TRUST_DOTNET_DEV_CERTS=1
       SETUP_DOCKER=1
       CONFIGURE_WEZTERM=1
-      CONFIGURE_NVIM=1
+      CONFIGURE_GHOSTTY=1
+      CONFIGURE_GHOSTTY=1
       INSTALL_NODE_TOOLS=1
       INSTALL_PYTHON_TOOLS=1
       INSTALL_MSSQL_TOOLS=1
@@ -107,7 +111,7 @@ while [[ $# -gt 0 ]]; do
     --trust-dotnet-dev-certs) TRUST_DOTNET_DEV_CERTS=1; shift ;;
     --setup-docker) SETUP_DOCKER=1; shift ;;
     --configure-wezterm) CONFIGURE_WEZTERM=1; shift ;;
-    --configure-ghostty) CONFIGURE_WEZTERM=1; shift ;; # backwards-compat alias
+    --configure-ghostty) CONFIGURE_GHOSTTY=1; shift ;;
     --configure-nvim) CONFIGURE_NVIM=1; shift ;;
     --install-node-tools) INSTALL_NODE_TOOLS=1; shift ;;
     --install-python-tools) INSTALL_PYTHON_TOOLS=1; shift ;;
@@ -148,7 +152,9 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 
 # Setup Homebrew PATH for Apple Silicon and Intel Macs
-if [[ -f /opt/homebrew/bin/brew ]]; then
+if command -v brew >/dev/null 2>&1; then
+  BREW_PREFIX="$(brew --prefix)"
+elif [[ -f /opt/homebrew/bin/brew ]]; then
   BREW_PREFIX="/opt/homebrew"
 elif [[ -f /usr/local/bin/brew ]]; then
   BREW_PREFIX="/usr/local"
@@ -158,8 +164,10 @@ else
 fi
 
 # Activate Homebrew in the current shell
-eval "$($BREW_PREFIX/bin/brew shellenv)"
-success "Homebrew ready"
+if ! command -v brew >/dev/null 2>&1 || [[ "$(command -v brew)" != "$BREW_PREFIX/bin/brew" ]]; then
+  eval "$($BREW_PREFIX/bin/brew shellenv)"
+fi
+success "Homebrew ready ($BREW_PREFIX)"
 
 # Idempotent config block helper
 configure_block() {
@@ -205,6 +213,7 @@ cat > "$BREWFILE" <<'EOF'
 brew "git"
 brew "git-flow"             # Git Flow (AVH edition via alias)
 brew "gh"                    # GitHub CLI
+brew "uv"                    # Modern Python package and version manager
 brew "mas"                   # Mac App Store CLI
 brew "wget"
 brew "curl"
@@ -225,8 +234,8 @@ brew "jq"                    # JSON processor
 brew "yq"                    # YAML processor
 
 # === Development Languages ===
-# Pin sane baselines for polyglot projects (Python, Node LTS, Go, Rust).
-brew "python@3.13"
+# Pin sane baselines for polyglot projects (Node LTS, Go, Rust).
+# Python is managed via uv (installed above).
 brew "nvm"                   # Node Version Manager (installs latest LTS below)
 brew "go"
 brew "rust"
@@ -236,8 +245,7 @@ brew "rust"
 brew "deno"                  # Secure JavaScript/TypeScript runtime
 
 # === Package Managers ===
-# pipx isolates Python apps (ruff, httpie) from system/site-packages.
-brew "pipx"                  # Python app installer
+# uv (installed above) handles Python versions and tool isolation.
 brew "poetry"                # Python dependency management
 
 # === Shell Enhancements ===
@@ -292,9 +300,9 @@ cask "dotnet-sdk"
 
 # Terminals
 cask "wezterm"
+cask "ghostty"               # modern gpu-accelerated terminal
 cask "warp"
 cask "iterm2"                # most stable terminal
-
 # Code Editors & IDEs
 cask "visual-studio-code"
 cask "cursor"
@@ -503,35 +511,24 @@ else
 fi
 
 ### 4) Configure Python
-# Optional: install developer tooling via pipx.
+# Optional: install developer tooling via uv.
 if [[ "$INSTALL_PYTHON_TOOLS" == "1" ]]; then
-  log "Configuring Python tooling (pipx)..."
+  log "Configuring Python tooling (uv)..."
 
-  PYTHON_BIN="$BREW_PREFIX/opt/python@3.13/libexec/bin"
+  # uv handles its own path; ensuring global tools are accessible
   if [[ "$CONFIGURE_SHELL" == "1" ]]; then
-    configure_block "$HOME/.zshrc" python313-path 'if command -v brew >/dev/null 2>&1; then
-  PY_BIN="$(brew --prefix)/opt/python@3.13/libexec/bin"
-  if [ -d "$PY_BIN" ]; then export PATH="$PY_BIN:$PATH"; fi
-fi'
-    configure_block "$HOME/.zshrc" pipx-path 'if [ -d "$HOME/.local/bin" ]; then
-  case ":$PATH:" in
-    *":$HOME/.local/bin:"*) ;;
-    *) export PATH="$HOME/.local/bin:$PATH" ;;
-  esac
-fi'
-  fi
 
-  export PATH="$PYTHON_BIN:$PATH"
-  [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
-
-  # Install essential Python tools
-  pipx install --force ruff
-  pipx install --force black
-  pipx install --force mypy
-  pipx install --force ipython
-  pipx install --force httpie
+  # Install essential Python tools globally via uv
+  uv tool install ruff --force
+  uv tool install black --force
+  uv tool install mypy --force
+  uv tool install ipython --force
+  uv tool install httpie --force
+  
+  # Install a recent Python version
+  uv python install 3.13
 else
-  warn "Skipping pipx Python tooling. Re-run with --install-python-tools if desired."
+  warn "Skipping Python tooling via uv. Re-run with --install-python-tools if desired."
 fi
 
 # Oh My Zsh keeps a familiar zsh environment; Starship configured below.
@@ -549,20 +546,27 @@ if [[ "$CONFIGURE_SHELL" == "1" ]]; then
   log "Configuring shell enhancements..."
 
   # Starship is a fast, cross-shell prompt with git/dir segments.
-  configure_block "$HOME/.zshrc" starship 'eval "$(starship init zsh)"'
+  # Using a more efficient loading pattern for shell tools
+  SHELL_TOOLS_CONTENT=$(cat <<'EOF'
+# Lazy-load shell tools to keep startup fast
+_init_shell_tools() {
+  if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
+  if command -v zoxide >/dev/null 2>&1; then eval "$(zoxide init zsh)"; fi
+  if command -v direnv >/dev/null 2>&1; then eval "$(direnv hook zsh)"; fi
+  if command -v uv >/dev/null 2>&1; then 
+    eval "$(uv generate-shell-completion zsh)"
+    eval "$(uvx --generate-shell-completion zsh)"
+  fi
+}
+_init_shell_tools
+EOF
+)
+  configure_block "$HOME/.zshrc" shell-tools "$SHELL_TOOLS_CONTENT"
 
   # Zsh plugins
   configure_block "$HOME/.zshrc" zsh-plugins "# Zsh plugins
 source $BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-
-  if command -v zoxide >/dev/null 2>&1; then
-    configure_block "$HOME/.zshrc" zoxide 'eval "$(zoxide init zsh)"'
-  fi
-
-  if command -v direnv >/dev/null 2>&1; then
-    configure_block "$HOME/.zshrc" direnv 'eval "$(direnv hook zsh)"'
-  fi
 
   ### 6) Configure fzf
   log "Configuring fzf..."
@@ -716,6 +720,27 @@ return {
 WEZTERM
 else
   warn "Skipping WezTerm config. Re-run with --configure-wezterm to write it."
+fi
+
+### 11.5) Setup Ghostty
+if [[ "$CONFIGURE_GHOSTTY" == "1" ]]; then
+  log "Configuring Ghostty..."
+  GHOSTTY_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ghostty"
+  GHOSTTY_CONFIG_FILE="$GHOSTTY_CONFIG_DIR/config"
+  mkdir -p "$GHOSTTY_CONFIG_DIR"
+  backup_file_if_exists "$GHOSTTY_CONFIG_FILE"
+
+  cat > "$GHOSTTY_CONFIG_FILE" <<'GHOSTTY'
+theme = catppuccin-mocha
+font-family = "JetBrains Mono"
+font-size = 13
+window-padding-x = 10
+window-padding-y = 10
+window-opacity = 0.95
+mouse-hide-while-typing = true
+GHOSTTY
+else
+  warn "Skipping Ghostty config. Re-run with --configure-ghostty to write it."
 fi
 
 ### 12) macOS System Preferences

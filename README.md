@@ -59,8 +59,9 @@ Practical tips for working on a Mac after running `macos-dev-quick-setup.sh`. Th
   - Useful commands: `bun --version`, `bun install`, `bunx <pkg>`, `bun run <script>`.
 
 - Python
-  - Use `pipx` for global CLI apps (e.g., `httpie`, `ruff`, `black`).
-  - Upgrade all Python CLIs: `pipx upgrade-all`.
+  - Use `uv` for managing Python versions and global CLI apps (e.g., `httpie`, `ruff`, `black`).
+  - Upgrade all global tools: `uv tool upgrade --all`.
+  - Install new versions: `uv python install 3.13`.
 
 - .NET
   - Dev HTTPS certs are trusted for local hosts; avoids browser warnings.
@@ -146,7 +147,18 @@ Practical tips for working on a Mac after running `macos-dev-quick-setup.sh`. Th
 - Screenshots
   - Saved to `~/Screenshots` as PNGs.
 
-- Utilities
+## Recommended Apps (Casks)
+
+When you run with `--with-casks`, the following are included:
+
+- **Terminals**: Ghostty, WezTerm, Warp, iTerm2.
+- **Editors**: VS Code, Cursor, Zed, Rider, DataGrip.
+- **Browsers**: Google Chrome.
+- **Dev Tools**: Docker, GitHub Desktop, SourceTree, Insomnia, Postman, TablePlus.
+- **Utilities**: Raycast, Rectangle, Maccy, CleanShot X, iStat Menus, Bartender, Superwhisper.
+- **Productivity/AI**: Slack, Discord, Zoom, Microsoft Teams, Claude, ChatGPT.
+
+## Utilities
   - Raycast (launcher), Rectangle (tiling), Maccy (clipboard), and more.
 
 ## Safety Defaults
@@ -166,7 +178,7 @@ Practical tips for working on a Mac after running `macos-dev-quick-setup.sh`. Th
   - Prefer project‑local dependencies; update globals carefully.
 
 - Python CLIs
-  - `pipx upgrade-all`.
+  - `uv tool upgrade --all`.
 
 - Docker
   - Prune periodically to reclaim space: `dprune` (review what’s being removed).
