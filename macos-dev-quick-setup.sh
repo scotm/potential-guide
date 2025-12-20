@@ -756,6 +756,7 @@ if [[ "$APPLY_MACOS_DEFAULTS" == "1" ]]; then
   # Trackpad
   defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
   defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+  defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false  # Reverse scrolling direction
 
   # TextEdit plain text by default
   defaults write com.apple.TextEdit RichText -int 0
