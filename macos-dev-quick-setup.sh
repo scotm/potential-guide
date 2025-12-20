@@ -325,6 +325,7 @@ cask "bartender"             # menu bar organizer
 cask "the-unarchiver"        # archive utility
 cask "appcleaner"            # uninstall apps completely
 cask "numi"                  # calculator
+cask "superwhisper"          # voice transcription
 
 # Cloud Storage & Sync
 cask "google-drive"
