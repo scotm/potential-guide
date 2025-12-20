@@ -749,8 +749,8 @@ if [[ "$APPLY_MACOS_DEFAULTS" == "1" ]]; then
   defaults write com.apple.screencapture type -string "png"
 
   # Keyboard
-  defaults write NSGlobalDomain KeyRepeat -int 1
-  defaults write NSGlobalDomain InitialKeyRepeat -int 10
+  defaults write NSGlobalDomain KeyRepeat -int 2
+  defaults write NSGlobalDomain InitialKeyRepeat -int 20
   defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
   # Trackpad
