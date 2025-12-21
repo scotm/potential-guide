@@ -778,6 +778,9 @@ if [[ "$APPLY_MACOS_DEFAULTS" == "1" ]]; then
   defaults write NSGlobalDomain InitialKeyRepeat -int 20
   defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
+  # Disable "Press Fn to" -> "Show Emoji & Symbols" (0=Do nothing)
+  defaults write com.apple.HIToolbox AppleFnUsageType -int 0
+
   # Trackpad
   defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
   defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
