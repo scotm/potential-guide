@@ -516,7 +516,6 @@ if [[ "$INSTALL_PYTHON_TOOLS" == "1" ]]; then
   log "Configuring Python tooling (uv)..."
 
   # uv handles its own path; ensuring global tools are accessible
-  if [[ "$CONFIGURE_SHELL" == "1" ]]; then
 
   # Install essential Python tools globally via uv
   uv tool install ruff --force
