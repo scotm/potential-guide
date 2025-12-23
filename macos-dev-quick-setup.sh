@@ -374,6 +374,7 @@ cask "zed"                   # fast collaborative editor
 
 # Browsers
 cask "google-chrome"
+cask "firefox"
 
 # Development Tools
 cask "docker"
