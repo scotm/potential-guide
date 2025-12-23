@@ -377,7 +377,7 @@ cask "google-chrome"
 cask "firefox"
 
 # Development Tools
-cask "docker"
+cask "docker-desktop"
 cask "github"                # GitHub Desktop
 cask "sourcetree"            # Git GUI
 cask "insomnia"              # API client
