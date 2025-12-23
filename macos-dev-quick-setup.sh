@@ -369,7 +369,6 @@ cask "iterm2"                # most stable terminal
 cask "visual-studio-code"
 cask "cursor"
 cask "jetbrains-toolbox"
-cask "rider"
 cask "datagrip"              # database IDE
 cask "zed"                   # fast collaborative editor
 
