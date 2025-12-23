@@ -326,6 +326,12 @@ brew "k9s"                   # k8s TUI
 brew "neovim"                # modern terminal-based editor
 brew "docker-compose"        # Docker Compose V2
 
+# === Media & Imaging Tools ===
+# Handy CLI utilities for video, images, and PDFs.
+brew "ffmpeg"
+brew "imagemagick"
+brew "ghostscript"
+
 # === Database Tools ===
 # Local services and shells; SQL Server tools are added later (optional).
 brew "postgresql@16"
