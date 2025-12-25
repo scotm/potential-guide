@@ -4,13 +4,15 @@ Practical tips for working on a Mac after running `macos-dev-quick-setup.sh`. Th
 
 ## Running the Script
 
-- Minimal (safe-by-default):
+- Full installation (default):
   - `./macos-dev-quick-setup.sh`
-- Full (installs casks, applies defaults, configures shell, etc.):
-  - `./macos-dev-quick-setup.sh --full`
-- Common combos:
+  - Installs everything: casks, macOS defaults, shell configuration, dev tools, etc.
+- Selective installation:
   - `./macos-dev-quick-setup.sh --with-casks --configure-shell --configure-git`
-  - `./macos-dev-quick-setup.sh --with-mas --install-vscode-exts --open-links`
+  - `./macos-dev-quick-setup.sh --install-vscode-exts --open-links`
+  - `./macos-dev-quick-setup.sh --install-node-tools --installpython-tools`
+- View all options:
+  - `./macos-dev-quick-setup.sh --help`
 
 ## Core Concepts
 
@@ -19,8 +21,12 @@ Practical tips for working on a Mac after running `macos-dev-quick-setup.sh`. Th
   - Zsh plugins: autosuggestions (accept with Right Arrow) and syntax highlighting catch mistakes early.
 
 - Idempotent Config Blocks
-  - When you enable shell-related flags (e.g. `--configure-shell`), the script writes BEGIN/END blocks into `~/.zprofile` and `~/.zshrc`.
-  - Re-running the script updates just those blocks.
+  - The script writes BEGIN/END blocks into `~/.zprofile` and `~/.zshrc` for shell configuration.
+  - Re-running the script updates just those blocks, keeping your other configs intact.
+
+- Debug Mode
+  - Set `MAC_DEV_SETUP_DEBUG=1` before running to enable early exit diagnostics.
+  - Helps track down silent failures that can occur with tools like nvm.
 
 ## Navigation & Discovery
 
@@ -50,28 +56,24 @@ Practical tips for working on a Mac after running `macos-dev-quick-setup.sh`. Th
 ## Runtimes & Packages
 
 - Node.js
-  - If enabled (`--install-node-tools`), the script installs `nvm` and installs/uses the latest Node LTS.
+  - Installed by default (`--install-node-tools`). Installs `nvm` and uses latest Node LTS.
   - Corepack is enabled; use `pnpm`, `yarn`, or `npm` per project.
 
 - Bun
-  - Installed via the official installer (`bun.sh`) when `--install-node-tools` is enabled.
-  - Adds `~/.bun/bin` to PATH when `--configure-shell` is enabled.
+  - Installed via the official installer (`bun.sh`) by default.
+  - Adds `~/.bun/bin` to PATH automatically.
   - Useful commands: `bun --version`, `bun install`, `bunx <pkg>`, `bun run <script>`.
 
 - Python
-  - Use `uv` for managing Python versions and global CLI apps (e.g., `httpie`, `ruff`, `black`).
+  - Installed by default (`--install-python-tools`). Uses `uv` to manage Python versions and global CLI apps (e.g., `httpie`, `ruff`, `black`, `mypy`).
   - Upgrade all global tools: `uv tool upgrade --all`.
-  - Install new versions: `uv python install 3.13`.
+  - Install new versions: `uv python install 3.14`.
 
 - .NET
-  - Dev HTTPS certs are trusted for local hosts; avoids browser warnings.
-  - Global .NET tools path (zsh): add to PATH so global tools like `sqlpackage` resolve
-    - Add to `~/.zprofile` (login shells):
-      - export PATH="$HOME/.dotnet/tools:$PATH"
-  - SqlPackage (DACFx) via .NET tool
-    - dotnet tool install -g microsoft.sqlpackage
-    - sqlpackage /version
-    - Note: macOS binary name is `sqlpackage` (no `.exe`).
+  - Dev HTTPS certs trusted by default (`--trust-dotnet-dev-certs`) to avoid browser warnings.
+  - SQL Server CLI tools installed by default (`--install-mssql-tools`).
+  - Global .NET tools path automatically added to PATH.
+  - SqlPackage available via `dotnet tool install -g microsoft.sqlpackage`.
 
 
 ## Environment Management (direnv)
@@ -119,7 +121,8 @@ Practical tips for working on a Mac after running `macos-dev-quick-setup.sh`. Th
 ## Editors & Terminal
 
 - VS Code
-  - If enabled (`--install-vscode-exts`), extensions for JS/TS, Python, .NET, Docker, GitLens are installed. Open a folder with `code .`.
+  - Extensions installed by default (`--install-vscode-exts`) for JS/TS, Python, .NET, Docker, GitLens, etc.
+  - Open a repository with `code .`.
 
 - Terminals
   - WezTerm (fast) and iTerm (rock‑solid) are both available when installing casks.
@@ -134,22 +137,38 @@ Practical tips for working on a Mac after running `macos-dev-quick-setup.sh`. Th
   - If you install it (npm package `@openai/codex`), run it directly as `codex`.
   - Prefer normal/sandboxed modes by default; only bypass approvals deliberately when you understand the risk.
 
-## Writing
 
-- iA Writer
-  - Installed via the Brewfile using `mas` (Mac App Store). You must be signed into the App Store, and the app must be previously purchased on your Apple ID. Launch with `open -a "iA Writer"`.
+
+## Shell Configuration
+
+Configured by default (`--configure-shell`) includes:
+
+- Zsh plugins (autosuggestions, syntax highlighting)
+- Starship prompt with git/context info
+- zoxide for smart directory jumping
+- direnv for project-specific environments
+- fzf for fuzzy finding
+- Comprehensive aliases for common commands
 
 ## macOS Quality‑of‑Life
 
+Applied by default (`--apply-macos-defaults`):
+
 - Finder & Dock
-  - The script enables path/status bars, shows hidden files, and tunes Dock animations.
+  - Enables path/status bars, shows hidden files, tunes Dock animations, sets list view as default.
 
 - Screenshots
   - Saved to `~/Screenshots` as PNGs.
 
+- Keyboard & Trackpad
+  - Faster key repeat, disables press-and-hold, enables tap-to-click, reverses natural scrolling.
+
+- Sudo Sessions
+  - Configured for 30-minute timeout to reduce password prompts during setup.
+
 ## Recommended Apps (Casks)
 
-When you run with `--with-casks`, the following are included:
+Installed by default (`--with-casks`):
 
 - **Terminals**: Ghostty, WezTerm, Warp, iTerm2.
 - **Editors**: VS Code, Cursor, Zed, Rider, DataGrip.
@@ -157,6 +176,15 @@ When you run with `--with-casks`, the following are included:
 - **Dev Tools**: Docker, GitHub Desktop, SourceTree, Insomnia, Postman, TablePlus.
 - **Utilities**: Raycast, Rectangle, Maccy, CleanShot X, iStat Menus, Bartender, Superwhisper.
 - **Productivity/AI**: Slack, Discord, Zoom, Microsoft Teams, Claude, ChatGPT.
+
+## Additional Features
+
+- SSH Keys: Generated by default (`--generate-ssh-key`) with ed25519 and Apple Keychain integration
+- Oh My Zsh: Installed by default for familiar zsh environment
+- Neovim: Basic configuration installed by default (`--configure-nvim`)
+- WezTerm/Ghostty: Terminal configs written by default (`--configure-wezterm`, `--configure-ghostty`)
+- Docker: Started and sanity-checked by default (`--setup-docker`)
+- Summary File: Written to desktop by default (`--write-summary`) with post-setup checklist
 
 ## Utilities
   - Raycast (launcher), Rectangle (tiling), Maccy (clipboard), and more.
