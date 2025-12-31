@@ -19,27 +19,27 @@ LAST_LINE=0
 LAST_COMMAND=""
 
 on_exit() {
-  local exit_code=$?
-  if [[ "${SETUP_COMPLETED}" != "1" ]]; then
-    warn "Exited early (status ${exit_code}) near line ${LAST_LINE}: ${LAST_COMMAND}"
-  fi
+	local exit_code=$?
+	if [[ "${SETUP_COMPLETED}" != "1" ]]; then
+		warn "Exited early (status ${exit_code}) near line ${LAST_LINE}: ${LAST_COMMAND}"
+	fi
 }
 
 if [[ "${MAC_DEV_SETUP_DEBUG:-0}" == "1" ]]; then
-  trap 'LAST_LINE=$LINENO; LAST_COMMAND=$BASH_COMMAND' DEBUG
-  trap on_exit EXIT
+	trap 'LAST_LINE=$LINENO; LAST_COMMAND=$BASH_COMMAND' DEBUG
+	trap on_exit EXIT
 fi
 
 trap 'error "Failed at line $LINENO: $BASH_COMMAND"' ERR
 
 # Check if running on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
-  error "This script is for macOS only"
-  exit 1
+	error "This script is for macOS only"
+	exit 1
 fi
 
 usage() {
-  cat <<'USAGE'
+	cat <<'USAGE'
 Usage: macos-dev-quick-setup.sh [options]
 
 Full-by-default: installs everything including casks, macOS defaults, and dev tools.
@@ -90,93 +90,93 @@ OPEN_LINKS=1
 WRITE_SUMMARY=1
 
 while [[ $# -gt 0 ]]; do
-  case "$1" in
-  --full)
-    # already default, but kept for compatibility
-    shift
-    ;;
-  --with-casks)
-    INSTALL_CASKS=1
-    shift
-    ;;
-  --apply-macos-defaults)
-    APPLY_MACOS_DEFAULTS=1
-    shift
-    ;;
-  --configure-shell)
-    CONFIGURE_SHELL=1
-    shift
-    ;;
-  --install-oh-my-zsh)
-    INSTALL_OH_MY_ZSH=1
-    shift
-    ;;
-  --configure-git)
-    CONFIGURE_GIT=1
-    shift
-    ;;
-  --configure-gpg)
-    CONFIGURE_GPG=1
-    shift
-    ;;
-  --generate-ssh-key)
-    GENERATE_SSH_KEY=1
-    shift
-    ;;
-  --trust-dotnet-dev-certs)
-    TRUST_DOTNET_DEV_CERTS=1
-    shift
-    ;;
-  --setup-docker)
-    SETUP_DOCKER=1
-    shift
-    ;;
-  --configure-wezterm)
-    CONFIGURE_WEZTERM=1
-    shift
-    ;;
-  --configure-ghostty)
-    CONFIGURE_GHOSTTY=1
-    shift
-    ;;
-  --configure-nvim)
-    CONFIGURE_NVIM=1
-    shift
-    ;;
-  --install-node-tools)
-    INSTALL_NODE_TOOLS=1
-    shift
-    ;;
-  --install-python-tools)
-    INSTALL_PYTHON_TOOLS=1
-    shift
-    ;;
-  --install-mssql-tools)
-    INSTALL_MSSQL_TOOLS=1
-    shift
-    ;;
-  --install-vscode-exts)
-    INSTALL_VSCODE_EXTS=1
-    shift
-    ;;
-  --open-links)
-    OPEN_LINKS=1
-    shift
-    ;;
-  --write-summary)
-    WRITE_SUMMARY=1
-    shift
-    ;;
-  -h | --help)
-    usage
-    exit 0
-    ;;
-  *)
-    error "Unknown option: $1"
-    usage
-    exit 2
-    ;;
-  esac
+	case "$1" in
+	--full)
+		# already default, but kept for compatibility
+		shift
+		;;
+	--with-casks)
+		INSTALL_CASKS=1
+		shift
+		;;
+	--apply-macos-defaults)
+		APPLY_MACOS_DEFAULTS=1
+		shift
+		;;
+	--configure-shell)
+		CONFIGURE_SHELL=1
+		shift
+		;;
+	--install-oh-my-zsh)
+		INSTALL_OH_MY_ZSH=1
+		shift
+		;;
+	--configure-git)
+		CONFIGURE_GIT=1
+		shift
+		;;
+	--configure-gpg)
+		CONFIGURE_GPG=1
+		shift
+		;;
+	--generate-ssh-key)
+		GENERATE_SSH_KEY=1
+		shift
+		;;
+	--trust-dotnet-dev-certs)
+		TRUST_DOTNET_DEV_CERTS=1
+		shift
+		;;
+	--setup-docker)
+		SETUP_DOCKER=1
+		shift
+		;;
+	--configure-wezterm)
+		CONFIGURE_WEZTERM=1
+		shift
+		;;
+	--configure-ghostty)
+		CONFIGURE_GHOSTTY=1
+		shift
+		;;
+	--configure-nvim)
+		CONFIGURE_NVIM=1
+		shift
+		;;
+	--install-node-tools)
+		INSTALL_NODE_TOOLS=1
+		shift
+		;;
+	--install-python-tools)
+		INSTALL_PYTHON_TOOLS=1
+		shift
+		;;
+	--install-mssql-tools)
+		INSTALL_MSSQL_TOOLS=1
+		shift
+		;;
+	--install-vscode-exts)
+		INSTALL_VSCODE_EXTS=1
+		shift
+		;;
+	--open-links)
+		OPEN_LINKS=1
+		shift
+		;;
+	--write-summary)
+		WRITE_SUMMARY=1
+		shift
+		;;
+	-h | --help)
+		usage
+		exit 0
+		;;
+	*)
+		error "Unknown option: $1"
+		usage
+		exit 2
+		;;
+	esac
 done
 
 log "Starting Mac development environment setup..."
@@ -189,10 +189,10 @@ sudo bash -c 'echo "Defaults timestamp_timeout=30" >> /etc/sudoers.d/99-sudo-tim
 
 ### 1) Xcode command line tools
 if ! xcode-select -p >/dev/null 2>&1; then
-  log "Installing Xcode Command Line Tools..."
-  xcode-select --install
-  warn "If a dialog appeared, accept it and re-run this script after installation completes."
-  exit 0
+	log "Installing Xcode Command Line Tools..."
+	xcode-select --install
+	warn "If a dialog appeared, accept it and re-run this script after installation completes."
+	exit 0
 fi
 success "Xcode Command Line Tools installed"
 
@@ -200,54 +200,54 @@ success "Xcode Command Line Tools installed"
 # Homebrew is the package manager used for installing CLI tools and apps.
 # We detect Apple Silicon (/opt/homebrew) vs Intel (/usr/local) so PATHs are correct.
 if ! command -v brew >/dev/null 2>&1; then
-  log "Installing Homebrew..."
-  /bin/bash -c \
-    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	log "Installing Homebrew..."
+	/bin/bash -c \
+		"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 # Setup Homebrew PATH for Apple Silicon and Intel Macs
 if command -v brew >/dev/null 2>&1; then
-  BREW_PREFIX="$(brew --prefix)"
+	BREW_PREFIX="$(brew --prefix)"
 elif [[ -f /opt/homebrew/bin/brew ]]; then
-  BREW_PREFIX="/opt/homebrew"
+	BREW_PREFIX="/opt/homebrew"
 elif [[ -f /usr/local/bin/brew ]]; then
-  BREW_PREFIX="/usr/local"
+	BREW_PREFIX="/usr/local"
 else
-  error "Homebrew installation not found"
-  exit 1
+	error "Homebrew installation not found"
+	exit 1
 fi
 
 # Activate Homebrew in the current shell
 if ! command -v brew >/dev/null 2>&1 || [[ "$(command -v brew)" != "$BREW_PREFIX/bin/brew" ]]; then
-  eval "$("$BREW_PREFIX/bin/brew" shellenv)"
+	eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 fi
 success "Homebrew ready ($BREW_PREFIX)"
 
 # Idempotent config block helper
 configure_block() {
-  # usage: configure_block <file> <name> <content...>
-  local FILE="$1"
-  shift
-  local NAME="$1"
-  shift
-  local BEGIN="# >>> mac-dev-setup ${NAME} >>>"
-  local END="# <<< mac-dev-setup ${NAME} <<<"
-  mkdir -p "$(dirname "$FILE")"
-  touch "$FILE"
-  sed -i '' "/$BEGIN/,/$END/d" "$FILE" 2>/dev/null || true
-  {
-    echo "$BEGIN"
-    printf "%s\n" "$@"
-    echo "$END"
-  } >>"$FILE"
+	# usage: configure_block <file> <name> <content...>
+	local FILE="$1"
+	shift
+	local NAME="$1"
+	shift
+	local BEGIN="# >>> mac-dev-setup ${NAME} >>>"
+	local END="# <<< mac-dev-setup ${NAME} <<<"
+	mkdir -p "$(dirname "$FILE")"
+	touch "$FILE"
+	sed -i '' "/$BEGIN/,/$END/d" "$FILE" 2>/dev/null || true
+	{
+		echo "$BEGIN"
+		printf "%s\n" "$@"
+		echo "$END"
+	} >>"$FILE"
 }
 
 backup_file_if_exists() {
-  # usage: backup_file_if_exists <file>
-  local FILE="$1"
-  if [[ -f "$FILE" ]]; then
-    cp "$FILE" "$FILE.bak.$(date -u +%Y%m%d-%H%M%S)"
-  fi
+	# usage: backup_file_if_exists <file>
+	local FILE="$1"
+	if [[ -f "$FILE" ]]; then
+		cp "$FILE" "$FILE.bak.$(date -u +%Y%m%d-%H%M%S)"
+	fi
 }
 
 # Ensure brew shellenv is loaded for future shells (login shells use .zprofile)
@@ -276,6 +276,7 @@ brew "curl"
 brew "tree"
 brew "htop"
 brew "ncdu"                  # disk usage analyzer
+brew "findutils"             # GNU find, xargs, locate (better than macOS builtins)
 
 # === Modern CLI Replacements ===
 # Faster, ergonomic drop-in replacements for common UNIX tools.
@@ -354,7 +355,7 @@ brew "pinentry-mac"          # GUI pinentry for GPG
 EOF
 
 if [[ "$INSTALL_CASKS" == "1" ]]; then
-  cat >>"$BREWFILE" <<'EOF'
+	cat >>"$BREWFILE" <<'EOF'
 
 # === GUI Apps (Homebrew Casks) ===
 # Optional: enable with --with-casks
@@ -433,7 +434,7 @@ cask "font-hack-nerd-font"
 cask "font-meslo-lg-nerd-font"
 EOF
 else
-  warn "Skipping Homebrew casks (GUI apps/fonts). Re-run with --with-casks to install them."
+	warn "Skipping Homebrew casks (GUI apps/fonts). Re-run with --with-casks to install them."
 fi
 
 log "Installing packages from Brewfile..."
@@ -446,31 +447,31 @@ brew install git-flow >/dev/null 2>&1 || brew install git-flow-avh >/dev/null 2>
 
 # Optional: SQL Server CLI tools for local/staging connectivity
 if [[ "$INSTALL_MSSQL_TOOLS" == "1" ]]; then
-  if ! command -v sqlcmd >/dev/null 2>&1; then
-    log "Installing SQL Server CLI tools (msodbcsql18, mssql-tools18)..."
-    brew tap microsoft/mssql-release https://github.com/microsoft/homebrew-mssql-release || true
-    ACCEPT_EULA=Y brew install msodbcsql18 mssql-tools18 || warn "mssql tools install may have partially failed"
-  fi
+	if ! command -v sqlcmd >/dev/null 2>&1; then
+		log "Installing SQL Server CLI tools (msodbcsql18, mssql-tools18)..."
+		brew tap microsoft/mssql-release https://github.com/microsoft/homebrew-mssql-release || true
+		ACCEPT_EULA=Y brew install msodbcsql18 mssql-tools18 || warn "mssql tools install may have partially failed"
+	fi
 
-  # Ensure MSSQL tools are on PATH for future shells (login shells read .zprofile)
-  if [ -d "$(brew --prefix)/opt/mssql-tools18/bin" ]; then
-    configure_block "$HOME/.zprofile" mssql-path "export PATH=\"$(brew --prefix)/opt/mssql-tools18/bin:\$PATH\""
-  fi
+	# Ensure MSSQL tools are on PATH for future shells (login shells read .zprofile)
+	if [ -d "$(brew --prefix)/opt/mssql-tools18/bin" ]; then
+		configure_block "$HOME/.zprofile" mssql-path "export PATH=\"$(brew --prefix)/opt/mssql-tools18/bin:\$PATH\""
+	fi
 else
-  warn "Skipping SQL Server CLI tools. Re-run with --install-mssql-tools if needed."
+	warn "Skipping SQL Server CLI tools. Re-run with --install-mssql-tools if needed."
 fi
 
 # Ensure .NET global tools are on PATH (login shells via .zprofile; interactive via .zshrc)
 if [[ "$CONFIGURE_SHELL" == "1" ]]; then
-  # shellcheck disable=SC2016
-  configure_block "$HOME/.zprofile" dotnet-tools 'if [ -d "$HOME/.dotnet/tools" ]; then
+	# shellcheck disable=SC2016
+	configure_block "$HOME/.zprofile" dotnet-tools 'if [ -d "$HOME/.dotnet/tools" ]; then
   case ":$PATH:" in
     *":$HOME/.dotnet/tools:"*) ;;
     *) export PATH="$HOME/.dotnet/tools:$PATH" ;;
   esac
 fi'
-  # shellcheck disable=SC2016
-  configure_block "$HOME/.zshrc" dotnet-tools 'if [ -d "$HOME/.dotnet/tools" ]; then
+	# shellcheck disable=SC2016
+	configure_block "$HOME/.zshrc" dotnet-tools 'if [ -d "$HOME/.dotnet/tools" ]; then
   case ":$PATH:" in
     *":$HOME/.dotnet/tools:"*) ;;
     *) export PATH="$HOME/.dotnet/tools:$PATH" ;;
@@ -481,172 +482,172 @@ fi
 ### 4) Configure Node.js and package managers
 # Optional: install Node via nvm (latest LTS).
 if [[ "$INSTALL_NODE_TOOLS" == "1" ]]; then
-  log "Configuring Node.js via nvm (latest LTS)..."
+	log "Configuring Node.js via nvm (latest LTS)..."
 
-  # nvm is installed via Homebrew (in the Brewfile). Ensure it's initialized.
-  NVM_DIR="$HOME/.nvm"
-  mkdir -p "$NVM_DIR"
+	# nvm is installed via Homebrew (in the Brewfile). Ensure it's initialized.
+	NVM_DIR="$HOME/.nvm"
+	mkdir -p "$NVM_DIR"
 
-  # Persist nvm init for future shells.
-  if [[ "$CONFIGURE_SHELL" == "1" ]]; then
-    # shellcheck disable=SC2016
-    configure_block "$HOME/.zshrc" nvm 'export NVM_DIR="$HOME/.nvm"
+	# Persist nvm init for future shells.
+	if [[ "$CONFIGURE_SHELL" == "1" ]]; then
+		# shellcheck disable=SC2016
+		configure_block "$HOME/.zshrc" nvm 'export NVM_DIR="$HOME/.nvm"
 # Homebrew installs nvm to /opt/homebrew/opt/nvm or /usr/local/opt/nvm
 [ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && . "$(brew --prefix)/opt/nvm/nvm.sh"'
-  fi
+	fi
 
-  # Run nvm in a subshell to isolate it from strict-mode flags.
-  # nvm is a shell function and can enable `set -e` internally; under strict mode that
-  # can cause early termination. This keeps Node setup best-effort and lets the script
-  # continue on to Python.
-  NVM_SH="$(brew --prefix)/opt/nvm/nvm.sh"
-  if [[ -s "$NVM_SH" ]]; then
-    (
-      set +e
-      set +u
-      set +o pipefail
+	# Run nvm in a subshell to isolate it from strict-mode flags.
+	# nvm is a shell function and can enable `set -e` internally; under strict mode that
+	# can cause early termination. This keeps Node setup best-effort and lets the script
+	# continue on to Python.
+	NVM_SH="$(brew --prefix)/opt/nvm/nvm.sh"
+	if [[ -s "$NVM_SH" ]]; then
+		(
+			set +e
+			set +u
+			set +o pipefail
 
-      export NVM_DIR="$HOME/.nvm"
-      # shellcheck disable=SC1090,SC1091
-      . "$NVM_SH"
+			export NVM_DIR="$HOME/.nvm"
+			# shellcheck disable=SC1090,SC1091
+			. "$NVM_SH"
 
-      log "Installing Node.js LTS via nvm..."
-      nvm install --lts --latest-npm || nvm install --lts || true
-      nvm alias default 'lts/*' >/dev/null 2>&1 || true
-      nvm use --lts >/dev/null 2>&1 || true
-    ) || warn "nvm step exited non-zero; continuing"
-    success "nvm step finished"
-  else
-    warn "nvm.sh not found at $NVM_SH; skipping Node installation"
-  fi
+			log "Installing Node.js LTS via nvm..."
+			nvm install --lts --latest-npm || nvm install --lts || true
+			nvm alias default 'lts/*' >/dev/null 2>&1 || true
+			nvm use --lts >/dev/null 2>&1 || true
+		) || warn "nvm step exited non-zero; continuing"
+		success "nvm step finished"
+	else
+		warn "nvm.sh not found at $NVM_SH; skipping Node installation"
+	fi
 
-  if command -v node >/dev/null 2>&1; then
-    success "Node.js available: $(node --version)"
-  else
-    warn "Node not on PATH yet. Open a new terminal or run: source ~/.zshrc"
-    warn "Continuing setup (Python/etc.) without Node"
-  fi
+	if command -v node >/dev/null 2>&1; then
+		success "Node.js available: $(node --version)"
+	else
+		warn "Node not on PATH yet. Open a new terminal or run: source ~/.zshrc"
+		warn "Continuing setup (Python/etc.) without Node"
+	fi
 
-  # Enable Corepack for pnpm/yarn
-  if command -v corepack >/dev/null 2>&1; then
-    corepack enable || true
-    corepack prepare pnpm@latest --activate || true
-  fi
+	# Enable Corepack for pnpm/yarn
+	if command -v corepack >/dev/null 2>&1; then
+		corepack enable || true
+		corepack prepare pnpm@latest --activate || true
+	fi
 
-  # Configure Bun and Deno environments
-  log "Configuring modern JavaScript runtimes..."
+	# Configure Bun and Deno environments
+	log "Configuring modern JavaScript runtimes..."
 
-  # Bun (recommended installer) - skip for now due to potential hangs
-  BUN_BIN_DIR="$HOME/.bun/bin"
-  if ! command -v bun >/dev/null 2>&1; then
-    log "Bun not installed (skipping installer to avoid hangs - install manually if needed)"
-  fi
+	# Bun (recommended installer) - skip for now due to potential hangs
+	BUN_BIN_DIR="$HOME/.bun/bin"
+	if ! command -v bun >/dev/null 2>&1; then
+		log "Bun not installed (skipping installer to avoid hangs - install manually if needed)"
+	fi
 
-  if [[ -d "$BUN_BIN_DIR" ]]; then
-    export PATH="$BUN_BIN_DIR:$PATH"
-    if [[ "$CONFIGURE_SHELL" == "1" ]]; then
-      # shellcheck disable=SC2016
-      configure_block "$HOME/.zshrc" bun-path 'if [ -d "$HOME/.bun/bin" ]; then
+	if [[ -d "$BUN_BIN_DIR" ]]; then
+		export PATH="$BUN_BIN_DIR:$PATH"
+		if [[ "$CONFIGURE_SHELL" == "1" ]]; then
+			# shellcheck disable=SC2016
+			configure_block "$HOME/.zshrc" bun-path 'if [ -d "$HOME/.bun/bin" ]; then
   case ":$PATH:" in
     *":$HOME/.bun/bin:"*) ;;
     *) export PATH="$HOME/.bun/bin:$PATH" ;;
   esac
 fi'
-    fi
-  fi
+		fi
+	fi
 
-  if command -v bun >/dev/null 2>&1; then
-    success "Bun available: $(bun --version)"
-    bun install -g typescript eslint prettier 2>/dev/null || true
-  else
-    warn "Bun not available on PATH"
-  fi
+	if command -v bun >/dev/null 2>&1; then
+		success "Bun available: $(bun --version)"
+		bun install -g typescript eslint prettier 2>/dev/null || true
+	else
+		warn "Bun not available on PATH"
+	fi
 
-  # Deno (Homebrew)
-  if command -v deno >/dev/null 2>&1; then
-    success "Deno installed: $(deno --version)"
-    # Skip vscode-deno plugin installation as it can be slow
-    log "Deno ready (VS Code plugin can be installed separately)"
-  fi
+	# Deno (Homebrew)
+	if command -v deno >/dev/null 2>&1; then
+		success "Deno installed: $(deno --version)"
+		# Skip vscode-deno plugin installation as it can be slow
+		log "Deno ready (VS Code plugin can be installed separately)"
+	fi
 
-  # Optional: global npm CLIs
-  if command -v npm >/dev/null 2>&1; then
-    log "Installing essential npm packages..."
-    npm install -g typescript tsx eslint prettier serve npm-check-updates 2>/dev/null || warn "Some npm packages may have failed"
-    success "npm packages installed"
-  else
-    warn "npm not available; skipping global npm packages"
-  fi
+	# Optional: global npm CLIs
+	if command -v npm >/dev/null 2>&1; then
+		log "Installing essential npm packages..."
+		npm install -g typescript tsx eslint prettier serve npm-check-updates 2>/dev/null || warn "Some npm packages may have failed"
+		success "npm packages installed"
+	else
+		warn "npm not available; skipping global npm packages"
+	fi
 
-  success "Node.js tooling section complete"
+	success "Node.js tooling section complete"
 else
-  warn "Skipping Node (nvm) setup. Re-run with --install-node-tools to enable it."
+	warn "Skipping Node (nvm) setup. Re-run with --install-node-tools to enable it."
 fi
 
 ### 5) Configure Python
 # Optional: install developer tooling via uv.
 if [[ "$INSTALL_PYTHON_TOOLS" == "1" ]]; then
-  log "Configuring Python tooling (uv)..."
+	log "Configuring Python tooling (uv)..."
 
-  # Install a recent Python version first
-  log "Installing Python 3.14 via uv..."
-  uv python install 3.14 || warn "Python 3.14 installation may have failed"
+	# Install a recent Python version first
+	log "Installing Python 3.14 via uv..."
+	uv python install 3.14 || warn "Python 3.14 installation may have failed"
 
-  # Pin Python for projects (uv reads .python-version in the current dir/parents).
-  # This does NOT change /opt/homebrew/bin/python3; it tells uv what to use.
-  mkdir -p "$HOME/Projects"
-  (cd "$HOME/Projects" && uv python pin 3.14) || warn "Failed to pin Python 3.14 in ~/Projects"
+	# Pin Python for projects (uv reads .python-version in the current dir/parents).
+	# This does NOT change /opt/homebrew/bin/python3; it tells uv what to use.
+	mkdir -p "$HOME/Projects"
+	(cd "$HOME/Projects" && uv python pin 3.14) || warn "Failed to pin Python 3.14 in ~/Projects"
 
-  # uv handles its own path; ensuring global tools are accessible
-  log "Installing Python development tools..."
+	# uv handles its own path; ensuring global tools are accessible
+	log "Installing Python development tools..."
 
-  # Install essential Python tools globally via uv
-  uv tool install ruff --force 2>/dev/null || warn "ruff install failed"
-  uv tool install black --force 2>/dev/null || warn "black install failed"
-  uv tool install mypy --force 2>/dev/null || warn "mypy install failed"
-  uv tool install ipython --force 2>/dev/null || warn "ipython install failed"
-  uv tool install httpie --force 2>/dev/null || warn "httpie install failed"
+	# Install essential Python tools globally via uv
+	uv tool install ruff --force 2>/dev/null || warn "ruff install failed"
+	uv tool install black --force 2>/dev/null || warn "black install failed"
+	uv tool install mypy --force 2>/dev/null || warn "mypy install failed"
+	uv tool install ipython --force 2>/dev/null || warn "ipython install failed"
+	uv tool install httpie --force 2>/dev/null || warn "httpie install failed"
 
-  if command -v uv >/dev/null 2>&1; then
-    UV_PYTHON_VERSION="$(uv run --python 3.14 python --version 2>/dev/null || true)"
-    if [[ -n "$UV_PYTHON_VERSION" ]]; then
-      success "uv-managed Python: $UV_PYTHON_VERSION"
-    else
-      warn "Unable to confirm uv-managed Python via 'uv run'"
-    fi
-  fi
+	if command -v uv >/dev/null 2>&1; then
+		UV_PYTHON_VERSION="$(uv run --python 3.14 python --version 2>/dev/null || true)"
+		if [[ -n "$UV_PYTHON_VERSION" ]]; then
+			success "uv-managed Python: $UV_PYTHON_VERSION"
+		else
+			warn "Unable to confirm uv-managed Python via 'uv run'"
+		fi
+	fi
 
-  if command -v python3 >/dev/null 2>&1; then
-    success "python3 on PATH: $(python3 --version)"
-  else
-    warn "python3 not on PATH yet. Open a new terminal or run: source ~/.zshrc"
-  fi
+	if command -v python3 >/dev/null 2>&1; then
+		success "python3 on PATH: $(python3 --version)"
+	else
+		warn "python3 not on PATH yet. Open a new terminal or run: source ~/.zshrc"
+	fi
 else
-  warn "Skipping Python tooling via uv. Re-run with --install-python-tools if desired."
+	warn "Skipping Python tooling via uv. Re-run with --install-python-tools if desired."
 fi
 
 # Oh My Zsh keeps a familiar zsh environment; Starship configured below.
 ### 6) Setup Oh My Zsh + shell enhancements
 if [[ "$INSTALL_OH_MY_ZSH" == "1" ]]; then
-  if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    log "Installing Oh My Zsh..."
-    # Use RUNZSH=no to prevent the installer from changing shell and exiting
-    RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" 2>/dev/null || warn "Oh My Zsh install may have failed"
-    success "Oh My Zsh installed"
-  else
-    success "Oh My Zsh already installed"
-  fi
+	if [ ! -d "$HOME/.oh-my-zsh" ]; then
+		log "Installing Oh My Zsh..."
+		# Use RUNZSH=no to prevent the installer from changing shell and exiting
+		RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" 2>/dev/null || warn "Oh My Zsh install may have failed"
+		success "Oh My Zsh installed"
+	else
+		success "Oh My Zsh already installed"
+	fi
 else
-  warn "Skipping Oh My Zsh. Re-run with --install-oh-my-zsh to install it."
+	warn "Skipping Oh My Zsh. Re-run with --install-oh-my-zsh to install it."
 fi
 
 if [[ "$CONFIGURE_SHELL" == "1" ]]; then
-  log "Configuring shell enhancements..."
+	log "Configuring shell enhancements..."
 
-  # Starship is a fast, cross-shell prompt with git/dir segments.
-  # Using a more efficient loading pattern for shell tools
-  SHELL_TOOLS_CONTENT=$(
-    cat <<'EOF'
+	# Starship is a fast, cross-shell prompt with git/dir segments.
+	# Using a more efficient loading pattern for shell tools
+	SHELL_TOOLS_CONTENT=$(
+		cat <<'EOF'
 # Lazy-load shell tools to keep startup fast
 _init_shell_tools() {
   if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
@@ -659,168 +660,168 @@ _init_shell_tools() {
 }
 _init_shell_tools
 EOF
-  )
-  configure_block "$HOME/.zshrc" shell-tools "$SHELL_TOOLS_CONTENT"
+	)
+	configure_block "$HOME/.zshrc" shell-tools "$SHELL_TOOLS_CONTENT"
 
-  # Zsh plugins
-  configure_block "$HOME/.zshrc" zsh-plugins "# Zsh plugins
+	# Zsh plugins
+	configure_block "$HOME/.zshrc" zsh-plugins "# Zsh plugins
 source $BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
-  log "Configuring fzf..."
-  "$BREW_PREFIX"/opt/fzf/install --all --no-bash --no-fish 2>/dev/null || warn "fzf configuration may have failed"
-  success "Shell enhancements configured"
+	log "Configuring fzf..."
+	"$BREW_PREFIX"/opt/fzf/install --all --no-bash --no-fish 2>/dev/null || warn "fzf configuration may have failed"
+	success "Shell enhancements configured"
 else
-  warn "Skipping shell enhancements. Re-run with --configure-shell to enable them."
+	warn "Skipping shell enhancements. Re-run with --configure-shell to enable them."
 fi
 
 ### 7) Git configuration
 # Optional: sets global defaults and credential manager.
 if [[ "$CONFIGURE_GIT" == "1" ]]; then
-  log "Configuring Git..."
-  git config --global init.defaultBranch main
-  git config --global pull.rebase false
-  git config --global core.autocrlf input
-  git config --global core.editor "code --wait"
-  git config --global merge.tool vscode
-  # shellcheck disable=SC2016
-  git config --global mergetool.vscode.cmd 'code --wait $MERGED'
-  git config --global diff.tool vscode
-  # shellcheck disable=SC2016
-  git config --global difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
+	log "Configuring Git..."
+	git config --global init.defaultBranch main
+	git config --global pull.rebase false
+	git config --global core.autocrlf input
+	git config --global core.editor "code --wait"
+	git config --global merge.tool vscode
+	# shellcheck disable=SC2016
+	git config --global mergetool.vscode.cmd 'code --wait $MERGED'
+	git config --global diff.tool vscode
+	# shellcheck disable=SC2016
+	git config --global difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
 
-  if command -v git-credential-manager >/dev/null 2>&1; then
-    log "Configuring Git credential manager..."
-    git-credential-manager configure 2>/dev/null || warn "git-credential-manager configure failed"
-  else
-    log "Installing Git credential manager..."
-    brew install --cask git-credential-manager 2>/dev/null || warn "git-credential-manager installation failed"
-    if command -v git-credential-manager >/dev/null 2>&1; then
-      git-credential-manager configure 2>/dev/null || warn "git-credential-manager configure failed"
-    fi
-  fi
-  success "Git configured"
+	if command -v git-credential-manager >/dev/null 2>&1; then
+		log "Configuring Git credential manager..."
+		git-credential-manager configure 2>/dev/null || warn "git-credential-manager configure failed"
+	else
+		log "Installing Git credential manager..."
+		brew install --cask git-credential-manager 2>/dev/null || warn "git-credential-manager installation failed"
+		if command -v git-credential-manager >/dev/null 2>&1; then
+			git-credential-manager configure 2>/dev/null || warn "git-credential-manager configure failed"
+		fi
+	fi
+	success "Git configured"
 else
-  warn "Skipping global Git configuration. Re-run with --configure-git if desired."
+	warn "Skipping global Git configuration. Re-run with --configure-git if desired."
 fi
 
 ### 7.5) GPG pinentry (GUI)
 # GUI passphrase prompts for GPG commit signing and sops usage.
 if [[ "$CONFIGURE_GPG" == "1" ]] && command -v gpg >/dev/null 2>&1; then
-  log "Configuring GPG pinentry (GUI)..."
-  mkdir -p "$HOME/.gnupg" && chmod 700 "$HOME/.gnupg"
-  PINENTRY_BIN="$(command -v pinentry-mac || true)"
-  if [ -z "$PINENTRY_BIN" ]; then
-    [ -x /opt/homebrew/bin/pinentry-mac ] && PINENTRY_BIN=/opt/homebrew/bin/pinentry-mac || PINENTRY_BIN=/usr/local/bin/pinentry-mac
-  fi
-  configure_block "$HOME/.gnupg/gpg-agent.conf" pinentry "pinentry-program $PINENTRY_BIN
+	log "Configuring GPG pinentry (GUI)..."
+	mkdir -p "$HOME/.gnupg" && chmod 700 "$HOME/.gnupg"
+	PINENTRY_BIN="$(command -v pinentry-mac || true)"
+	if [ -z "$PINENTRY_BIN" ]; then
+		[ -x /opt/homebrew/bin/pinentry-mac ] && PINENTRY_BIN=/opt/homebrew/bin/pinentry-mac || PINENTRY_BIN=/usr/local/bin/pinentry-mac
+	fi
+	configure_block "$HOME/.gnupg/gpg-agent.conf" pinentry "pinentry-program $PINENTRY_BIN
 default-cache-ttl 600
 max-cache-ttl 7200"
-  chmod 600 "$HOME/.gnupg/gpg-agent.conf" 2>/dev/null || true
-  gpgconf --kill gpg-agent 2>/dev/null || true
+	chmod 600 "$HOME/.gnupg/gpg-agent.conf" 2>/dev/null || true
+	gpgconf --kill gpg-agent 2>/dev/null || true
 elif [[ "$CONFIGURE_GPG" == "1" ]]; then
-  warn "GPG not available; skipping pinentry configuration."
+	warn "GPG not available; skipping pinentry configuration."
 else
-  warn "Skipping GPG pinentry configuration. Re-run with --configure-gpg to enable it."
+	warn "Skipping GPG pinentry configuration. Re-run with --configure-gpg to enable it."
 fi
 
 ### 8) Setup SSH key
 if [[ "$GENERATE_SSH_KEY" == "1" ]]; then
-  mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
+	mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
 
-  if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
-    log "Generating SSH key..."
-    ssh-keygen -t ed25519 -C "$(hostname)" -f "$HOME/.ssh/id_ed25519" -N ""
-    success "SSH key generated at ~/.ssh/id_ed25519.pub"
-  else
-    success "SSH key already exists at ~/.ssh/id_ed25519"
-  fi
+	if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
+		log "Generating SSH key..."
+		ssh-keygen -t ed25519 -C "$(hostname)" -f "$HOME/.ssh/id_ed25519" -N ""
+		success "SSH key generated at ~/.ssh/id_ed25519.pub"
+	else
+		success "SSH key already exists at ~/.ssh/id_ed25519"
+	fi
 
-  # Start ssh-agent and add key
-  eval "$(ssh-agent -s)" >/dev/null
-  ssh-add --apple-use-keychain "$HOME/.ssh/id_ed25519" 2>/dev/null || ssh-add "$HOME/.ssh/id_ed25519" || true
+	# Start ssh-agent and add key
+	eval "$(ssh-agent -s)" >/dev/null
+	ssh-add --apple-use-keychain "$HOME/.ssh/id_ed25519" 2>/dev/null || ssh-add "$HOME/.ssh/id_ed25519" || true
 
-  # Configure SSH to use keychain (non-destructive block)
-  SSH_CONFIG="$HOME/.ssh/config"
-  backup_file_if_exists "$SSH_CONFIG"
-  chmod 600 "$SSH_CONFIG" 2>/dev/null || true
-  configure_block "$SSH_CONFIG" macos-keychain "Host *
+	# Configure SSH to use keychain (non-destructive block)
+	SSH_CONFIG="$HOME/.ssh/config"
+	backup_file_if_exists "$SSH_CONFIG"
+	chmod 600 "$SSH_CONFIG" 2>/dev/null || true
+	configure_block "$SSH_CONFIG" macos-keychain "Host *
   AddKeysToAgent yes
   UseKeychain yes
   IdentityFile ~/.ssh/id_ed25519"
-  chmod 600 "$SSH_CONFIG" 2>/dev/null || true
+	chmod 600 "$SSH_CONFIG" 2>/dev/null || true
 
-  success "SSH key configured"
-  warn "Add your SSH key to GitHub: pbcopy < ~/.ssh/id_ed25519.pub"
+	success "SSH key configured"
+	warn "Add your SSH key to GitHub: pbcopy < ~/.ssh/id_ed25519.pub"
 else
-  warn "Skipping SSH key generation. Re-run with --generate-ssh-key to enable it."
+	warn "Skipping SSH key generation. Re-run with --generate-ssh-key to enable it."
 fi
 
 ### 9) .NET development certificates
 # Optional: trusts dev HTTPS certs so local HTTPS hosts work without warnings.
 if [[ "$TRUST_DOTNET_DEV_CERTS" == "1" ]]; then
-  log "Trusting .NET development certificates..."
-  if command -v dotnet >/dev/null 2>&1; then
-    dotnet dev-certs https --trust 2>/dev/null || warn ".NET dev-certs trust may have failed"
-    success ".NET certificates configured"
-  else
-    warn "dotnet not found; skipping dev-certs trust"
-  fi
+	log "Trusting .NET development certificates..."
+	if command -v dotnet >/dev/null 2>&1; then
+		dotnet dev-certs https --trust 2>/dev/null || warn ".NET dev-certs trust may have failed"
+		success ".NET certificates configured"
+	else
+		warn "dotnet not found; skipping dev-certs trust"
+	fi
 else
-  warn "Skipping .NET dev-certs trust. Re-run with --trust-dotnet-dev-certs if desired."
+	warn "Skipping .NET dev-certs trust. Re-run with --trust-dotnet-dev-certs if desired."
 fi
 
 ### 10) Docker configuration
 # Optional: starts Docker Desktop and runs a hello-world sanity check.
 if [[ "$SETUP_DOCKER" == "1" ]]; then
-  log "Configuring Docker..."
+	log "Configuring Docker..."
 
-  if [ -d "/Applications/Docker.app" ]; then
-    open -g -a "Docker" || true
-  else
-    warn "Docker.app not found (install via --with-casks or manually)."
-  fi
+	if [ -d "/Applications/Docker.app" ]; then
+		open -g -a "Docker" || true
+	else
+		warn "Docker.app not found (install via --with-casks or manually)."
+	fi
 
-  # Ensure Docker Desktop CLI + credential helper resolve
-  DD="/Applications/Docker.app/Contents/Resources/bin"
-  if [ -x "$DD/docker" ] && [ -x "$DD/docker-credential-osxkeychain" ]; then
-    mkdir -p "$HOME/.local/bin"
-    ln -sf "$DD/docker" "$HOME/.local/bin/docker" || true
-    ln -sf "$DD/docker-credential-osxkeychain" "$HOME/.local/bin/docker-credential-osxkeychain" || true
-  fi
+	# Ensure Docker Desktop CLI + credential helper resolve
+	DD="/Applications/Docker.app/Contents/Resources/bin"
+	if [ -x "$DD/docker" ] && [ -x "$DD/docker-credential-osxkeychain" ]; then
+		mkdir -p "$HOME/.local/bin"
+		ln -sf "$DD/docker" "$HOME/.local/bin/docker" || true
+		ln -sf "$DD/docker-credential-osxkeychain" "$HOME/.local/bin/docker-credential-osxkeychain" || true
+	fi
 
-  # Preflight: engine reachability, set Desktop context, pull hello-world
-  if command -v docker >/dev/null 2>&1; then
-    # Set Docker context if desktop-linux exists
-    if docker context ls 2>/dev/null | grep -q desktop-linux; then
-      docker context use desktop-linux >/dev/null 2>&1 || true
-    fi
-    if ! docker version >/dev/null 2>&1; then
-      warn "Docker engine not reachable yet; waiting briefly..."
-      sleep 5
-    fi
-    if docker run --rm hello-world >/dev/null 2>&1; then
-      success "Docker working correctly"
-    else
-      warn "hello-world still failing; try again after Docker fully starts"
-    fi
-  else
-    warn "docker CLI not found on PATH."
-  fi
+	# Preflight: engine reachability, set Desktop context, pull hello-world
+	if command -v docker >/dev/null 2>&1; then
+		# Set Docker context if desktop-linux exists
+		if docker context ls 2>/dev/null | grep -q desktop-linux; then
+			docker context use desktop-linux >/dev/null 2>&1 || true
+		fi
+		if ! docker version >/dev/null 2>&1; then
+			warn "Docker engine not reachable yet; waiting briefly..."
+			sleep 5
+		fi
+		if docker run --rm hello-world >/dev/null 2>&1; then
+			success "Docker working correctly"
+		else
+			warn "hello-world still failing; try again after Docker fully starts"
+		fi
+	else
+		warn "docker CLI not found on PATH."
+	fi
 else
-  warn "Skipping Docker setup. Re-run with --setup-docker if desired."
+	warn "Skipping Docker setup. Re-run with --setup-docker if desired."
 fi
 
 ### 11) Setup WezTerm
 # Writes a minimal WezTerm config; backs up existing config if present.
 if [[ "$CONFIGURE_WEZTERM" == "1" ]]; then
-  log "Configuring WezTerm..."
-  WEZTERM_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/wezterm"
-  WEZTERM_CONFIG_FILE="$WEZTERM_CONFIG_DIR/wezterm.lua"
-  mkdir -p "$WEZTERM_CONFIG_DIR"
-  backup_file_if_exists "$WEZTERM_CONFIG_FILE"
+	log "Configuring WezTerm..."
+	WEZTERM_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/wezterm"
+	WEZTERM_CONFIG_FILE="$WEZTERM_CONFIG_DIR/wezterm.lua"
+	mkdir -p "$WEZTERM_CONFIG_DIR"
+	backup_file_if_exists "$WEZTERM_CONFIG_FILE"
 
-  cat >"$WEZTERM_CONFIG_FILE" <<'WEZTERM'
+	cat >"$WEZTERM_CONFIG_FILE" <<'WEZTERM'
 local wezterm = require 'wezterm'
 
 return {
@@ -832,18 +833,18 @@ return {
 }
 WEZTERM
 else
-  warn "Skipping WezTerm config. Re-run with --configure-wezterm to write it."
+	warn "Skipping WezTerm config. Re-run with --configure-wezterm to write it."
 fi
 
 ### 11.5) Setup Ghostty
 if [[ "$CONFIGURE_GHOSTTY" == "1" ]]; then
-  log "Configuring Ghostty..."
-  GHOSTTY_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ghostty"
-  GHOSTTY_CONFIG_FILE="$GHOSTTY_CONFIG_DIR/config"
-  mkdir -p "$GHOSTTY_CONFIG_DIR"
-  backup_file_if_exists "$GHOSTTY_CONFIG_FILE"
+	log "Configuring Ghostty..."
+	GHOSTTY_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ghostty"
+	GHOSTTY_CONFIG_FILE="$GHOSTTY_CONFIG_DIR/config"
+	mkdir -p "$GHOSTTY_CONFIG_DIR"
+	backup_file_if_exists "$GHOSTTY_CONFIG_FILE"
 
-  cat >"$GHOSTTY_CONFIG_FILE" <<'GHOSTTY'
+	cat >"$GHOSTTY_CONFIG_FILE" <<'GHOSTTY'
 theme = catppuccin-mocha
 font-family = "JetBrains Mono"
 font-size = 13
@@ -853,61 +854,61 @@ window-opacity = 0.95
 mouse-hide-while-typing = true
 GHOSTTY
 else
-  warn "Skipping Ghostty config. Re-run with --configure-ghostty to write it."
+	warn "Skipping Ghostty config. Re-run with --configure-ghostty to write it."
 fi
 
 ### 12) macOS System Preferences
 # Optional: sensible defaults (Finder visibility, Dock behavior, keyboard/trackpad, etc.)
 if [[ "$APPLY_MACOS_DEFAULTS" == "1" ]]; then
-  log "Configuring macOS preferences..."
+	log "Configuring macOS preferences..."
 
-  # Finder
-  defaults write com.apple.finder ShowPathbar -bool true
-  defaults write com.apple.finder ShowStatusBar -bool true
-  defaults write com.apple.finder AppleShowAllFiles -bool true
-  defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-  defaults write com.apple.finder FXDefaultSearchScope -string "SCcf" # Search current folder
-  defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+	# Finder
+	defaults write com.apple.finder ShowPathbar -bool true
+	defaults write com.apple.finder ShowStatusBar -bool true
+	defaults write com.apple.finder AppleShowAllFiles -bool true
+	defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+	defaults write com.apple.finder FXDefaultSearchScope -string "SCcf" # Search current folder
+	defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 
-  # Set list view as default for all Finder windows
-  defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-  # Arrange by name in list view
-  defaults write com.apple.finder FXArrangeGroupViewBy -string "Name"
-  defaults write com.apple.finder FXPreferredGroupBy -string "None"
+	# Set list view as default for all Finder windows
+	defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+	# Arrange by name in list view
+	defaults write com.apple.finder FXArrangeGroupViewBy -string "Name"
+	defaults write com.apple.finder FXPreferredGroupBy -string "None"
 
-  # Dock
-  defaults write com.apple.dock autohide -bool true
-  defaults write com.apple.dock autohide-delay -float 0
-  defaults write com.apple.dock autohide-time-modifier -float 0.3
-  defaults write com.apple.dock show-recents -bool false
-  defaults write com.apple.dock minimize-to-application -bool true
+	# Dock
+	defaults write com.apple.dock autohide -bool true
+	defaults write com.apple.dock autohide-delay -float 0
+	defaults write com.apple.dock autohide-time-modifier -float 0.3
+	defaults write com.apple.dock show-recents -bool false
+	defaults write com.apple.dock minimize-to-application -bool true
 
-  # Screenshots
-  mkdir -p "$HOME/Screenshots"
-  defaults write com.apple.screencapture location -string "$HOME/Screenshots"
-  defaults write com.apple.screencapture type -string "png"
+	# Screenshots
+	mkdir -p "$HOME/Screenshots"
+	defaults write com.apple.screencapture location -string "$HOME/Screenshots"
+	defaults write com.apple.screencapture type -string "png"
 
-  # Keyboard
-  defaults write NSGlobalDomain KeyRepeat -int 2
-  defaults write NSGlobalDomain InitialKeyRepeat -int 20
-  defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+	# Keyboard
+	defaults write NSGlobalDomain KeyRepeat -int 2
+	defaults write NSGlobalDomain InitialKeyRepeat -int 20
+	defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
-  # Disable "Press Fn to" -> "Show Emoji & Symbols" (0=Do nothing)
-  defaults write com.apple.HIToolbox AppleFnUsageType -int 0
+	# Disable "Press Fn to" -> "Show Emoji & Symbols" (0=Do nothing)
+	defaults write com.apple.HIToolbox AppleFnUsageType -int 0
 
-  # Trackpad
-  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-  defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
-  defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false # Reverse scrolling direction
+	# Trackpad
+	defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+	defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+	defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false # Reverse scrolling direction
 
-  # TextEdit plain text by default
-  defaults write com.apple.TextEdit RichText -int 0
+	# TextEdit plain text by default
+	defaults write com.apple.TextEdit RichText -int 0
 
-  # Restart affected services
-  killall Finder 2>/dev/null || true
-  killall Dock 2>/dev/null || true
+	# Restart affected services
+	killall Finder 2>/dev/null || true
+	killall Dock 2>/dev/null || true
 else
-  warn "Skipping macOS defaults. Re-run with --apply-macos-defaults to enable them."
+	warn "Skipping macOS defaults. Re-run with --apply-macos-defaults to enable them."
 fi
 
 ### 13) Create useful directories
@@ -919,9 +920,9 @@ mkdir -p "$HOME/.config"
 ### 14) Setup shell aliases
 # Optional: installs aliases into ~/.zshrc.
 if [[ "$CONFIGURE_SHELL" == "1" ]]; then
-  # Safer defaults (no aliasing cd). `cat` uses bat -pp to preserve pipes.
-  configure_block "$HOME/.zshrc" aliases "$(
-    cat <<'ALIASES'
+	# Safer defaults (no aliasing cd). `cat` uses bat -pp to preserve pipes.
+	configure_block "$HOME/.zshrc" aliases "$(
+		cat <<'ALIASES'
 # Custom aliases
 alias ll='eza -la --icons --git'
 alias l='eza -l --icons --git'
@@ -990,20 +991,20 @@ alias dex='docker exec -it'
 alias dlog='docker logs -f'
 alias dprune='docker system prune'
 ALIASES
-  )"
+	)"
 else
-  warn "Skipping aliases. Re-run with --configure-shell to enable them."
+	warn "Skipping aliases. Re-run with --configure-shell to enable them."
 fi
 
 ### 15) Configure Neovim
 if [[ "$CONFIGURE_NVIM" == "1" ]]; then
-  log "Configuring Neovim..."
-  NVIM_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
-  mkdir -p "$NVIM_CONFIG"
-  backup_file_if_exists "$NVIM_CONFIG/init.lua"
+	log "Configuring Neovim..."
+	NVIM_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+	mkdir -p "$NVIM_CONFIG"
+	backup_file_if_exists "$NVIM_CONFIG/init.lua"
 
-  # Create basic Neovim config
-  cat >"$NVIM_CONFIG/init.lua" <<'NVIM'
+	# Create basic Neovim config
+	cat >"$NVIM_CONFIG/init.lua" <<'NVIM'
 -- Basic Neovim configuration
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -1039,12 +1040,12 @@ vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
 NVIM
 
-  # Create backup directory for undofile
-  mkdir -p "$HOME/.vim/undodir"
+	# Create backup directory for undofile
+	mkdir -p "$HOME/.vim/undodir"
 
-  success "Neovim configured with basic settings"
+	success "Neovim configured with basic settings"
 else
-  warn "Skipping Neovim config. Re-run with --configure-nvim to write it."
+	warn "Skipping Neovim config. Re-run with --configure-nvim to write it."
 fi
 
 ### 16) Final setup steps
@@ -1052,43 +1053,43 @@ log "Running final setup..."
 
 # VS Code extensions
 if [[ "$INSTALL_VSCODE_EXTS" == "1" ]]; then
-  if command -v code >/dev/null 2>&1; then
-    log "Installing VS Code extensions..."
-    code --install-extension dbaeumer.vscode-eslint 2>/dev/null || true
-    code --install-extension esbenp.prettier-vscode 2>/dev/null || true
-    code --install-extension ms-python.python 2>/dev/null || true
-    code --install-extension ms-vscode.cpptools 2>/dev/null || true
-    code --install-extension golang.go 2>/dev/null || true
-    code --install-extension rust-lang.rust-analyzer 2>/dev/null || true
-    code --install-extension ms-dotnettools.csharp 2>/dev/null || true
-    code --install-extension GitHub.copilot 2>/dev/null || true
-    code --install-extension eamodio.gitlens 2>/dev/null || true
-    code --install-extension ms-vscode-remote.remote-containers 2>/dev/null || true
-    code --install-extension ms-azuretools.vscode-docker 2>/dev/null || true
-    code --install-extension denoland.vscode-deno 2>/dev/null || true
-    code --install-extension oven.bun-vscode 2>/dev/null || true
-    success "VS Code extensions installed (some may have failed silently)"
-  else
-    warn "VS Code CLI ('code') not found; skipping extensions"
-  fi
+	if command -v code >/dev/null 2>&1; then
+		log "Installing VS Code extensions..."
+		code --install-extension dbaeumer.vscode-eslint 2>/dev/null || true
+		code --install-extension esbenp.prettier-vscode 2>/dev/null || true
+		code --install-extension ms-python.python 2>/dev/null || true
+		code --install-extension ms-vscode.cpptools 2>/dev/null || true
+		code --install-extension golang.go 2>/dev/null || true
+		code --install-extension rust-lang.rust-analyzer 2>/dev/null || true
+		code --install-extension ms-dotnettools.csharp 2>/dev/null || true
+		code --install-extension GitHub.copilot 2>/dev/null || true
+		code --install-extension eamodio.gitlens 2>/dev/null || true
+		code --install-extension ms-vscode-remote.remote-containers 2>/dev/null || true
+		code --install-extension ms-azuretools.vscode-docker 2>/dev/null || true
+		code --install-extension denoland.vscode-deno 2>/dev/null || true
+		code --install-extension oven.bun-vscode 2>/dev/null || true
+		success "VS Code extensions installed (some may have failed silently)"
+	else
+		warn "VS Code CLI ('code') not found; skipping extensions"
+	fi
 else
-  warn "Skipping VS Code extensions. Re-run with --install-vscode-exts to enable them."
+	warn "Skipping VS Code extensions. Re-run with --install-vscode-exts to enable them."
 fi
 
 # Open useful links
 if [[ "$OPEN_LINKS" == "1" ]]; then
-  log "Opening helpful resources..."
-  open "https://github.com/settings/keys" || true
+	log "Opening helpful resources..."
+	open "https://github.com/settings/keys" || true
 else
-  warn "Skipping opening browser links. Re-run with --open-links if desired."
+	warn "Skipping opening browser links. Re-run with --open-links if desired."
 fi
 
 # Create a summary file
 if [[ "$WRITE_SUMMARY" == "1" ]]; then
-  SUMMARY_FILE="$HOME/Desktop/setup-complete.md"
-  backup_file_if_exists "$SUMMARY_FILE"
+	SUMMARY_FILE="$HOME/Desktop/setup-complete.md"
+	backup_file_if_exists "$SUMMARY_FILE"
 
-  cat >"$SUMMARY_FILE" <<'SUMMARY'
+	cat >"$SUMMARY_FILE" <<'SUMMARY'
 # Mac Development Setup Complete
 
 ## Quick Checks
@@ -1106,7 +1107,7 @@ if [[ "$WRITE_SUMMARY" == "1" ]]; then
   - `git config --global user.email "you@example.com"`
 SUMMARY
 else
-  warn "Skipping summary file. Re-run with --write-summary to enable it."
+	warn "Skipping summary file. Re-run with --write-summary to enable it."
 fi
 
 SETUP_COMPLETED=1
@@ -1115,15 +1116,15 @@ echo ""
 warn "Important next steps:"
 echo "  1. Restart your terminal or run: exec zsh"
 if [[ "$GENERATE_SSH_KEY" == "1" ]]; then
-  echo "  2. Add SSH key to GitHub: pbcopy < ~/.ssh/id_ed25519.pub"
+	echo "  2. Add SSH key to GitHub: pbcopy < ~/.ssh/id_ed25519.pub"
 else
-  echo "  2. (Optional) Generate SSH key: re-run with --generate-ssh-key"
+	echo "  2. (Optional) Generate SSH key: re-run with --generate-ssh-key"
 fi
 if [[ "$CONFIGURE_GIT" == "0" ]]; then
-  echo "  3. (Optional) Configure Git defaults: re-run with --configure-git"
+	echo "  3. (Optional) Configure Git defaults: re-run with --configure-git"
 else
-  echo "  3. Configure Git identity (name/email)"
+	echo "  3. Configure Git identity (name/email)"
 fi
 if [[ "$WRITE_SUMMARY" == "1" ]]; then
-  echo "  4. Check ~/Desktop/setup-complete.md for a cheat sheet"
+	echo "  4. Check ~/Desktop/setup-complete.md for a cheat sheet"
 fi
